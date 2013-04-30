@@ -1,0 +1,1096 @@
+00434FC9
+
+00434FB6   |> \FF75 14        push dword ptr ss:[ebp+14]       ; /Arg7
+00434FB9   |.  FF70 10        push dword ptr ds:[eax+10]       ; |Arg6
+00434FBC   |.  FF75 10        push dword ptr ss:[ebp+10]       ; |Arg5
+00434FBF   |.  FF70 14        push dword ptr ds:[eax+14]       ; |Arg4
+00434FC2   |.  FF75 0C        push dword ptr ss:[ebp+C]        ; |Arg3
+00434FC5   |.  FF75 08        push dword ptr ss:[ebp+8]        ; |Arg2
+00434FC8   |.  53             push ebx                         ; |Arg1
+00434FC9   |.  E8 ACFDFFFF    call HideWiza.00434D7A           ; \HideWiza.00434D7A
+
+004123E5	关闭按钮
+0042AB5F	激活注册码按钮
+
+hsluoyz@sohu.com
+12345678901234567
+
+0042AC9B      /75 1C          jnz short HideWiza.0042ACB9
+0042AC9D      |394D F0        cmp dword ptr ss:[ebp-10],ecx
+0042ACA0      |75 17          jnz short HideWiza.0042ACB9 ////////////////////////////enable this
+0042ACA2   |. |8B45 EC        mov eax,dword ptr ss:[ebp-14]
+0042ACA5   |. |6A 0A          push 0A                                          ; /lParam = A
+0042ACA7   |. |6A 01          push 1                                           ; |wParam = 1
+0042ACA9   |. |68 CA040000    push 4CA                                         ; |Message = MSG(4CA)
+0042ACAE   |. |FF70 20        push dword ptr ds:[eax+20]                       ; |hWnd
+0042ACB1   |. |FF15 84D54600  call dword ptr ds:[<&USER32.SendMessageA>]       ; \SendMessageA
+0042ACB7   |. |EB 0C          jmp short HideWiza.0042ACC5
+0042ACB9   |> \8BCE           mov ecx,esi
+0042ACBB   |>  68 F2DC4600    push HideWiza.0046DCF2
+0042ACC0   |.  E8 1B7BFDFF    call HideWiza.004027E0
+0042ACC5   |>  5E             pop esi
+0042ACC6   |.  C9             leave
+0042ACC7   \.  C3             retn
+
+
+
+0045A62B   /$  8BFF           mov edi,edi
+0045A62D   |.  56             push esi
+0045A62E   |.  57             push edi
+0045A62F   |.  BE 7C974700    mov esi,HideWiza.0047977C                        ;  UNICODE "KERNEL32.DLL"
+0045A634   |.  56             push esi                                         ; /pModule => "KERNEL32.DLL"
+0045A635   |.  FF15 0CD34600  call dword ptr ds:[<&KERNEL32.GetModuleHandleW>] ; \GetModuleHandleW
+0045A63B   |.  85C0           test eax,eax
+0045A63D   |.  75 07          jnz short HideWiza.0045A646
+0045A63F   |.  56             push esi
+0045A640   |.  E8 FBC2FFFF    call HideWiza.00456940
+0045A645   |.  59             pop ecx
+0045A646   |>  8BF8           mov edi,eax
+0045A648   |.  85FF           test edi,edi
+0045A64A   |.  0F84 5E010000  je HideWiza.0045A7AE
+0045A650   |.  8B35 90D14600  mov esi,dword ptr ds:[<&KERNEL32.GetProcAddress>>;  kernel32.GetProcAddress
+0045A656   |.  68 C8974700    push HideWiza.004797C8                           ; /ProcNameOrOrdinal = "FlsAlloc"
+0045A65B   |.  57             push edi                                         ; |hModule
+0045A65C   |.  FFD6           call esi                                         ; \GetProcAddress
+0045A65E   |.  68 BC974700    push HideWiza.004797BC                           ; /ProcNameOrOrdinal = "FlsGetValue"
+0045A663   |.  57             push edi                                         ; |hModule
+0045A664   |.  A3 94134900    mov dword ptr ds:[491394],eax                    ; |
+0045A669   |.  FFD6           call esi                                         ; \GetProcAddress
+0045A66B   |.  68 B0974700    push HideWiza.004797B0                           ; /ProcNameOrOrdinal = "FlsSetValue"
+0045A670   |.  57             push edi                                         ; |hModule
+0045A671   |.  A3 98134900    mov dword ptr ds:[491398],eax                    ; |
+0045A676   |.  FFD6           call esi                                         ; \GetProcAddress
+0045A678   |.  68 A8974700    push HideWiza.004797A8                           ; /ProcNameOrOrdinal = "FlsFree"
+0045A67D   |.  57             push edi                                         ; |hModule
+0045A67E   |.  A3 9C134900    mov dword ptr ds:[49139C],eax                    ; |
+0045A683   |.  FFD6           call esi                                         ; \GetProcAddress
+0045A685   |.  833D 94134900 >cmp dword ptr ds:[491394],0
+0045A68C   |.  8B35 1CD34600  mov esi,dword ptr ds:[<&KERNEL32.TlsSetValue>]   ;  kernel32.TlsSetValue
+0045A692   |.  A3 A0134900    mov dword ptr ds:[4913A0],eax
+0045A697   |.  74 16          je short HideWiza.0045A6AF
+0045A699   |.  833D 98134900 >cmp dword ptr ds:[491398],0
+0045A6A0   |.  74 0D          je short HideWiza.0045A6AF
+0045A6A2   |.  833D 9C134900 >cmp dword ptr ds:[49139C],0
+0045A6A9   |.  74 04          je short HideWiza.0045A6AF
+0045A6AB   |.  85C0           test eax,eax
+0045A6AD   |.  75 24          jnz short HideWiza.0045A6D3
+0045A6AF   |>  A1 10D34600    mov eax,dword ptr ds:[<&KERNEL32.TlsGetValue>]
+0045A6B4   |.  A3 98134900    mov dword ptr ds:[491398],eax
+0045A6B9   |.  A1 24D34600    mov eax,dword ptr ds:[<&KERNEL32.TlsFree>]
+0045A6BE   |.  C705 94134900 >mov dword ptr ds:[491394],HideWiza.0045A25D
+0045A6C8   |.  8935 9C134900  mov dword ptr ds:[49139C],esi
+0045A6CE   |.  A3 A0134900    mov dword ptr ds:[4913A0],eax
+0045A6D3   |>  FF15 18D34600  call dword ptr ds:[<&KERNEL32.TlsAlloc>]         ; [TlsAlloc
+0045A6D9   |.  A3 70C54800    mov dword ptr ds:[48C570],eax
+0045A6DE   |.  83F8 FF        cmp eax,-1
+0045A6E1   |.  0F84 CC000000  je HideWiza.0045A7B3
+0045A6E7   |.  FF35 98134900  push dword ptr ds:[491398]
+0045A6ED   |.  50             push eax
+0045A6EE   |.  FFD6           call esi
+0045A6F0   |.  85C0           test eax,eax
+0045A6F2   |.  0F84 BB000000  je HideWiza.0045A7B3
+0045A6F8   |.  E8 2DC5FFFF    call HideWiza.00456C2A
+0045A6FD   |.  FF35 94134900  push dword ptr ds:[491394]
+0045A703   |.  E8 68FAFFFF    call HideWiza.0045A170
+0045A708   |.  FF35 98134900  push dword ptr ds:[491398]
+0045A70E   |.  A3 94134900    mov dword ptr ds:[491394],eax
+0045A713   |.  E8 58FAFFFF    call HideWiza.0045A170
+0045A718   |.  FF35 9C134900  push dword ptr ds:[49139C]
+0045A71E   |.  A3 98134900    mov dword ptr ds:[491398],eax
+0045A723   |.  E8 48FAFFFF    call HideWiza.0045A170
+0045A728   |.  FF35 A0134900  push dword ptr ds:[4913A0]                       ; |Arg1 = 00000000
+0045A72E   |.  A3 9C134900    mov dword ptr ds:[49139C],eax                    ; |
+0045A733   |.  E8 38FAFFFF    call HideWiza.0045A170                           ; \HideWiza.0045A170
+0045A738   |.  83C4 10        add esp,10
+0045A73B   |.  A3 A0134900    mov dword ptr ds:[4913A0],eax
+0045A740   |.  E8 DC460000    call HideWiza.0045EE21
+0045A745   |.  85C0           test eax,eax
+0045A747   |.  74 65          je short HideWiza.0045A7AE
+0045A749   |.  68 8EA44500    push HideWiza.0045A48E                           ;  入口地址
+0045A74E   |.  FF35 94134900  push dword ptr ds:[491394]                       ; /Arg1 = 00000000
+0045A754   |.  E8 92FAFFFF    call HideWiza.0045A1EB                           ; \HideWiza.0045A1EB
+0045A759   |.  59             pop ecx
+0045A75A   |.  FFD0           call eax
+0045A75C   |.  A3 6CC54800    mov dword ptr ds:[48C56C],eax
+0045A761   |.  83F8 FF        cmp eax,-1
+0045A764   |.  74 48          je short HideWiza.0045A7AE
+0045A766   |.  68 14020000    push 214
+0045A76B   |.  6A 01          push 1
+0045A76D   |.  E8 45340000    call HideWiza.0045DBB7
+0045A772   |.  8BF0           mov esi,eax
+0045A774   |.  59             pop ecx
+0045A775   |.  59             pop ecx
+0045A776   |.  85F6           test esi,esi
+0045A778   |.  74 34          je short HideWiza.0045A7AE
+0045A77A   |.  56             push esi
+0045A77B   |.  FF35 6CC54800  push dword ptr ds:[48C56C]
+0045A781   |.  FF35 9C134900  push dword ptr ds:[49139C]                       ; /Arg1 = 00000000
+0045A787   |.  E8 5FFAFFFF    call HideWiza.0045A1EB                           ; \HideWiza.0045A1EB
+0045A78C   |.  59             pop ecx
+0045A78D   |.  FFD0           call eax
+0045A78F   |.  85C0           test eax,eax
+0045A791   |.  74 1B          je short HideWiza.0045A7AE
+0045A793   |.  6A 00          push 0
+0045A795   |.  56             push esi
+0045A796   |.  E8 79FBFFFF    call HideWiza.0045A314
+0045A79B   |.  59             pop ecx
+0045A79C   |.  59             pop ecx
+0045A79D   |.  FF15 B0D14600  call dword ptr ds:[<&KERNEL32.GetCurrentThreadId>; [GetCurrentThreadId
+0045A7A3   |.  834E 04 FF     or dword ptr ds:[esi+4],FFFFFFFF
+0045A7A7   |.  8906           mov dword ptr ds:[esi],eax
+0045A7A9   |.  33C0           xor eax,eax
+0045A7AB   |.  40             inc eax
+0045A7AC   |.  EB 07          jmp short HideWiza.0045A7B5
+0045A7AE   |>  E8 24FBFFFF    call HideWiza.0045A2D7
+0045A7B3   |>  33C0           xor eax,eax
+0045A7B5   |>  5F             pop edi
+0045A7B6   |.  5E             pop esi
+0045A7B7   \.  C3             retn
+
+
+0045A7B7
+00453421
+
+0045340B    > \51             push ecx
+0045340C    .  50             push eax
+0045340D    .  56             push esi
+0045340E    .  68 00004000    push HideWiza.00400000
+00453413    .  E8 56420100    call HideWiza.0046766E //////////////////打开窗口
+00453418    .  8945 E0        mov dword ptr ss:[ebp-20],eax
+0045341B    .  3975 E4        cmp dword ptr ss:[ebp-1C],esi
+0045341E    .  75 06          jnz short HideWiza.00453426 ///////////////////结束了
+00453420    .  50             push eax
+00453421    .  E8 BA370000    call HideWiza.00456BE0
+00453426    >  E8 E1370000    call HideWiza.00456C0C
+0045342B    .  897D FC        mov dword ptr ss:[ebp-4],edi
+0045342E    .  EB 35          jmp short HideWiza.00453465
+00453430    .  8B45 EC        mov eax,dword ptr ss:[ebp-14]
+00453433    .  8B08           mov ecx,dword ptr ds:[eax]
+00453435    .  8B09           mov ecx,dword ptr ds:[ecx]
+00453437    .  894D DC        mov dword ptr ss:[ebp-24],ecx
+0045343A    .  50             push eax
+0045343B    .  51             push ecx
+0045343C    .  E8 A3C60000    call HideWiza.0045FAE4
+00453441    .  59             pop ecx
+00453442    .  59             pop ecx
+00453443    .  C3             retn
+
+
+
+004676B1   /.  55             push ebp
+004676B2   |.  8BEC           mov ebp,esp
+004676B4   |.  53             push ebx
+004676B5   |.  56             push esi
+004676B6   |.  57             push edi
+004676B7   |.  83CB FF        or ebx,FFFFFFFF
+004676BA   |.  E8 643FFDFF    call HideWiza.0043B623
+004676BF   |.  8BF0           mov esi,eax
+004676C1   |.  E8 F0C6FCFF    call HideWiza.00433DB6 ////////////////////EAX不太一样
+004676C6   |.  FF75 14        push dword ptr ss:[ebp+14]                       ; /Arg4
+004676C9   |.  8B78 04        mov edi,dword ptr ds:[eax+4]                     ; |
+004676CC   |.  FF75 10        push dword ptr ss:[ebp+10]                       ; |Arg3
+004676CF   |.  FF75 0C        push dword ptr ss:[ebp+C]                        ; |Arg2
+004676D2   |.  FF75 08        push dword ptr ss:[ebp+8]                        ; |Arg1
+004676D5   |.  E8 0768FEFF    call HideWiza.0044DEE1                           ; \HideWiza.0044DEE1
+004676DA   |.  85C0           test eax,eax
+004676DC   |.  74 3C          je short HideWiza.0046771A
+004676DE   |.  85FF           test edi,edi
+004676E0   |.  74 0E          je short HideWiza.004676F0
+004676E2   |.  8B07           mov eax,dword ptr ds:[edi]
+004676E4   |.  8BCF           mov ecx,edi
+004676E6   |.  FF90 90000000  call dword ptr ds:[eax+90]
+004676EC   |.  85C0           test eax,eax
+004676EE   |.  74 2A          je short HideWiza.0046771A
+004676F0   |>  8B06           mov eax,dword ptr ds:[esi]
+004676F2   |.  8BCE           mov ecx,esi
+004676F4   |.  FF50 50        call dword ptr ds:[eax+50] //////////////////////打开窗口
+004676F7   |.  85C0           test eax,eax
+004676F9   |.  75 16          jnz short HideWiza.00467711
+004676FB   |.  3946 20        cmp dword ptr ds:[esi+20],eax
+004676FE   |.  74 08          je short HideWiza.00467708
+00467700   |.  8B4E 20        mov ecx,dword ptr ds:[esi+20]
+00467703   |.  8B01           mov eax,dword ptr ds:[ecx]
+00467705   |.  FF50 60        call dword ptr ds:[eax+60]
+00467708   |>  8B06           mov eax,dword ptr ds:[esi]
+0046770A   |.  8BCE           mov ecx,esi
+0046770C   |.  FF50 68        call dword ptr ds:[eax+68]
+0046770F   |.  EB 07          jmp short HideWiza.00467718
+00467711   |>  8B06           mov eax,dword ptr ds:[esi]
+00467713   |.  8BCE           mov ecx,esi
+00467715   |.  FF50 54        call dword ptr ds:[eax+54]
+00467718   |>  8BD8           mov ebx,eax
+0046771A   |>  E8 18B9FDFF    call HideWiza.00443037
+0046771F   |.  5F             pop edi
+00467720   |.  5E             pop esi
+00467721   |.  8BC3           mov eax,ebx
+00467723   |.  5B             pop ebx
+00467724   |.  5D             pop ebp
+00467725   \.  C2 1000        retn 10
+
+
+
+
+0041E1C2    .  55             push ebp
+0041E1C3    .  8DAC24 A8E7FFF>lea ebp,dword ptr ss:[esp-1858]
+0041E1CA    .  B8 58180000    mov eax,1858
+0041E1CF    .  E8 3C270300    call HideWiza.00450910
+0041E1D4    .  6A FF          push -1
+0041E1D6    .  68 7F964600    push HideWiza.0046967F
+0041E1DB    .  64:A1 00000000 mov eax,dword ptr fs:[0]
+0041E1E1    .  50             push eax
+0041E1E2    .  81EC A0010000  sub esp,1A0
+0041E1E8    .  A1 C0C24800    mov eax,dword ptr ds:[48C2C0]
+0041E1ED    .  33C5           xor eax,ebp
+0041E1EF    .  8985 54180000  mov dword ptr ss:[ebp+1854],eax
+0041E1F5    .  53             push ebx
+0041E1F6    .  56             push esi
+0041E1F7    .  57             push edi
+0041E1F8    .  50             push eax
+0041E1F9    .  8D45 F4        lea eax,dword ptr ss:[ebp-C]
+0041E1FC    .  64:A3 00000000 mov dword ptr fs:[0],eax
+0041E202    .  68 60EE4800    push HideWiza.0048EE60           ; /pVersionInformation = HideWiza.0048EE60
+0041E207    .  894D DC        mov dword ptr ss:[ebp-24],ecx    ; |
+0041E20A    .  C705 60EE4800 >mov dword ptr ds:[48EE60],94     ; |
+0041E214    .  FF15 E0D14600  call dword ptr ds:[<&KERNEL32.Ge>; \GetVersionExA
+0041E21A    .  33DB           xor ebx,ebx
+0041E21C    .  833D 64EE4800 >cmp dword ptr ds:[48EE64],5
+0041E223    .  75 08          jnz short HideWiza.0041E22D
+0041E225    .  391D 68EE4800  cmp dword ptr ds:[48EE68],ebx
+0041E22B    .  74 2C          je short HideWiza.0041E259
+0041E22D    >  E8 71AE0000    call HideWiza.004290A3
+0041E232    .  85C0           test eax,eax
+0041E234    .  74 23          je short HideWiza.0041E259
+0041E236    .  68 1C3F4700    push HideWiza.00473F1C           ;  ASCII "http://www.seapsoft.com/cn/hw/wow64.html"
+0041E23B    .  E8 CDAF0000    call HideWiza.0042920D
+0041E240    .  59             pop ecx
+0041E241    .  6A 40          push 40                          ; /Style = MB_OK|MB_ICONASTERISK|MB_APPLMODAL
+0041E243    .  68 103F4700    push HideWiza.00473F10           ; |Title = "版本不兼容"
+0041E248    .  68 B03E4700    push HideWiza.00473EB0           ; |Text = "您的操作系统为64位，请使用无忧隐藏64位版本
+下载地址：http://www.seapsoft.com/cn/hw/wow64.html"
+0041E24D    .  53             push ebx                         ; |hOwner
+0041E24E    .  FF15 C0D64600  call dword ptr ds:[<&USER32.Mess>; \MessageBoxA
+0041E254    .  E9 A2040000    jmp HideWiza.0041E6FB
+0041E259    >  53             push ebx                         ; /Arg1
+0041E25A    .  E8 79080200    call HideWiza.0043EAD8           ; \HideWiza.0043EAD8
+0041E25F    .  59             pop ecx
+0041E260    .  FF15 F0D14600  call dword ptr ds:[<&KERNEL32.Ge>; [GetCommandLineA
+0041E266    .  50             push eax
+0041E267    .  B9 FCEE4800    mov ecx,HideWiza.0048EEFC
+0041E26C    .  E8 6F45FEFF    call HideWiza.004027E0
+0041E271    .  68 03010000    push 103
+0041E276    .  8D85 B9160000  lea eax,dword ptr ss:[ebp+16B9]
+0041E27C    .  53             push ebx
+0041E27D    .  50             push eax
+0041E27E    .  889D B8160000  mov byte ptr ss:[ebp+16B8],bl
+0041E284    .  E8 57160300    call HideWiza.0044F8E0
+0041E289    .  83C4 0C        add esp,0C
+0041E28C    .  BE 04010000    mov esi,104
+0041E291    .  56             push esi                         ; /BufSize => 104 (260.)
+0041E292    .  8D85 B8160000  lea eax,dword ptr ss:[ebp+16B8]  ; |
+0041E298    .  50             push eax                         ; |PathBuffer
+0041E299    .  53             push ebx                         ; |hModule
+0041E29A    .  FF15 ECD14600  call dword ptr ds:[<&KERNEL32.Ge>; \GetModuleFileNameA
+0041E2A0    .  56             push esi
+0041E2A1    .  BE 40EA4800    mov esi,HideWiza.0048EA40
+0041E2A6    .  56             push esi
+0041E2A7    .  8D85 B8160000  lea eax,dword ptr ss:[ebp+16B8]
+0041E2AD    .  50             push eax
+0041E2AE    .  FF15 E8D14600  call dword ptr ds:[<&KERNEL32.Ge>;  kernel32.GetLongPathNameA
+0041E2B4    .  8B3D 0CD44600  mov edi,dword ptr ds:[<&KERNEL32>;  kernel32.lstrcpyA
+0041E2BA    .  56             push esi                         ; /String2 => ""
+0041E2BB    .  BE 48EB4800    mov esi,HideWiza.0048EB48        ; |
+0041E2C0    .  56             push esi                         ; |String1 => HideWiza.0048EB48
+0041E2C1    .  FFD7           call edi                         ; \lstrcpyA
+0041E2C3    .  56             push esi                         ; /Path => ""
+0041E2C4    .  FF15 B0D44600  call dword ptr ds:[<&SHLWAPI.Pat>; \PathRemoveFileSpecA
+0041E2CA    .  56             push esi                         ; /Path => ""
+0041E2CB    .  FF15 E4D14600  call dword ptr ds:[<&KERNEL32.Se>; \SetCurrentDirectoryA
+0041E2D1    .  56             push esi                         ; /String2 => ""
+0041E2D2    .  68 50EC4800    push HideWiza.0048EC50           ; |String1 = HideWiza.0048EC50
+0041E2D7    .  FFD7           call edi                         ; \lstrcpyA
+0041E2D9    .  8B3D D4D14600  mov edi,dword ptr ds:[<&KERNEL32>;  kernel32.lstrcatA
+0041E2DF    .  68 E83D4700    push HideWiza.00473DE8           ; /StringToAdd = "\"
+0041E2E4    .  68 50EC4800    push HideWiza.0048EC50           ; |ConcatString = ""
+0041E2E9    .  FFD7           call edi                         ; \lstrcatA
+0041E2EB    .  68 A43E4700    push HideWiza.00473EA4           ; /StringToAdd = "hookpro.sys"
+0041E2F0    .  68 50EC4800    push HideWiza.0048EC50           ; |ConcatString = ""
+0041E2F5    .  FFD7           call edi                         ; \lstrcatA
+0041E2F7    .  56             push esi                         ; /String2 => ""
+0041E2F8    .  BE 58ED4800    mov esi,HideWiza.0048ED58        ; |
+0041E2FD    .  56             push esi                         ; |String1 => HideWiza.0048ED58
+0041E2FE    .  FF15 0CD44600  call dword ptr ds:[<&KERNEL32.ls>; \lstrcpyA
+0041E304    .  68 E83D4700    push HideWiza.00473DE8           ; /StringToAdd = "\"
+0041E309    .  56             push esi                         ; |ConcatString => ""
+0041E30A    .  FFD7           call edi                         ; \lstrcatA
+0041E30C    .  68 943E4700    push HideWiza.00473E94           ; /StringToAdd = "filehook.sys"
+0041E311    .  56             push esi                         ; |ConcatString => ""
+0041E312    .  FFD7           call edi                         ; \lstrcatA
+0041E314    .  53             push ebx
+0041E315    .  BE FCEE4800    mov esi,HideWiza.0048EEFC
+0041E31A    .  68 8C3E4700    push HideWiza.00473E8C           ;  ASCII "-unin"
+0041E31F    .  8BCE           mov ecx,esi
+0041E321    .  E8 04CBFEFF    call HideWiza.0040AE2A
+0041E326    .  85C0           test eax,eax
+0041E328    .  7C 24          jl short HideWiza.0041E34E
+0041E32A    .  53             push ebx
+0041E32B    .  E8 09AC0000    call HideWiza.00428F39
+0041E330    .  C70424 E8E6460>mov dword ptr ss:[esp],HideWiza.>;  ASCII "SEAPHIDEFILE"
+0041E337    .  E8 52AB0000    call HideWiza.00428E8E
+0041E33C    .  C70424 803E470>mov dword ptr ss:[esp],HideWiza.>;  ASCII "SEAPHIDEPRO"
+0041E343    .  E8 46AB0000    call HideWiza.00428E8E
+0041E348    .  59             pop ecx
+0041E349    .  E9 AD030000    jmp HideWiza.0041E6FB
+0041E34E    >  8D45 D8        lea eax,dword ptr ss:[ebp-28]
+0041E351    .  50             push eax
+0041E352    .  8D45 D4        lea eax,dword ptr ss:[ebp-2C]
+0041E355    .  33FF           xor edi,edi
+0041E357    .  50             push eax
+0041E358    .  47             inc edi
+0041E359    .  68 40EA4800    push HideWiza.0048EA40
+0041E35E    .  897D D4        mov dword ptr ss:[ebp-2C],edi
+0041E361    .  895D D8        mov dword ptr ss:[ebp-28],ebx
+0041E364    .  FF15 FCD74600  call dword ptr ds:[<&imagehlp.Ma>;  imagehlp.MapFileAndCheckSumA //////////////////////////////////////////////////Checksum!!!
+0041E36A    .  85C0           test eax,eax
+0041E36C    .  75 0C          jnz short HideWiza.0041E37A
+0041E36E    .  8B45 D4        mov eax,dword ptr ss:[ebp-2C]
+0041E371    .  3B45 D8        cmp eax,dword ptr ss:[ebp-28]
+0041E374    .  0F85 81030000  jnz HideWiza.0041E6FB ////////////////////////////////should not jmp, so nop it
+0041E37A    >  68 6C3E4700    push HideWiza.00473E6C           ;  ASCII "SEAN_U_HIDE_WIZARD"
+0041E37F    .  8D4D E0        lea ecx,dword ptr ss:[ebp-20]
+0041E382    .  E8 604BFEFF    call HideWiza.00402EE7
+0041E387    .  FF75 E0        push dword ptr ss:[ebp-20]       ; /MutexName
+0041E38A    .  895D FC        mov dword ptr ss:[ebp-4],ebx     ; |
+0041E38D    .  53             push ebx                         ; |Inheritable
+0041E38E    .  57             push edi                         ; |Access
+0041E38F    .  FF15 2CD44600  call dword ptr ds:[<&KERNEL32.Op>; \OpenMutexA
+0041E395    .  8B7D DC        mov edi,dword ptr ss:[ebp-24]
+0041E398    .  8987 A4000000  mov dword ptr ds:[edi+A4],eax
+0041E39E    .  3BC3           cmp eax,ebx
+0041E3A0    .  0F84 97000000  je HideWiza.0041E43D
+0041E3A6    .  53             push ebx
+0041E3A7    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0041E3AA    .  68 C41C4700    push HideWiza.00471CC4           ;  ASCII "All"
+0041E3AF    .  50             push eax
+0041E3B0    .  895D E4        mov dword ptr ss:[ebp-1C],ebx
+0041E3B3    .  895D F0        mov dword ptr ss:[ebp-10],ebx
+0041E3B6    .  E8 B6A40000    call HideWiza.00428871
+0041E3BB    .  83C4 0C        add esp,0C
+0041E3BE    .  85C0           test eax,eax
+0041E3C0    .  74 1F          je short HideWiza.0041E3E1
+0041E3C2    .  8D45 DC        lea eax,dword ptr ss:[ebp-24]
+0041E3C5    .  50             push eax                         ; /pBufSize
+0041E3C6    .  8D45 E4        lea eax,dword ptr ss:[ebp-1C]    ; |
+0041E3C9    .  50             push eax                         ; |Buffer
+0041E3CA    .  53             push ebx                         ; |pValueType
+0041E3CB    .  53             push ebx                         ; |Reserved
+0041E3CC    .  68 643E4700    push HideWiza.00473E64           ; |ValueName = "REPEAT"
+0041E3D1    .  FF75 F0        push dword ptr ss:[ebp-10]       ; |hKey
+0041E3D4    .  C745 DC 040000>mov dword ptr ss:[ebp-24],4      ; |
+0041E3DB    .  FF15 14D04600  call dword ptr ds:[<&ADVAPI32.Re>; \RegQueryValueExA
+0041E3E1    >  FF75 F0        push dword ptr ss:[ebp-10]       ; /hKey
+0041E3E4    .  FF15 04D04600  call dword ptr ds:[<&ADVAPI32.Re>; \RegCloseKey
+0041E3EA    .  68 603E4700    push HideWiza.00473E60
+0041E3EF    .  8BCE           mov ecx,esi
+0041E3F1    .  E8 2973FEFF    call HideWiza.0040571F
+0041E3F6    .  85C0           test eax,eax
+0041E3F8    .  74 2C          je short HideWiza.0041E426
+0041E3FA    .  395D E4        cmp dword ptr ss:[ebp-1C],ebx
+0041E3FD    .  74 14          je short HideWiza.0041E413
+0041E3FF    .  6A 01          push 1                           ; /lParam = 1
+0041E401    .  6A 01          push 1                           ; |wParam = 1
+0041E403    .  68 66040000    push 466                         ; |Message = MSG(466)
+0041E408    .  FF75 E4        push dword ptr ss:[ebp-1C]       ; |hWnd
+0041E40B    .  FF15 B8D54600  call dword ptr ds:[<&USER32.Post>; \PostMessageA
+0041E411    .  EB 13          jmp short HideWiza.0041E426
+0041E413    >  6A 40          push 40                          ; /Style = MB_OK|MB_ICONASTERISK|MB_APPLMODAL
+0041E415    .  68 543E4700    push HideWiza.00473E54           ; |Title = "系统繁忙"
+0041E41A    .  68 243E4700    push HideWiza.00473E24           ; |Text = "上一次运行的无忧隐藏尚未完全退出，请稍候再试"
+0041E41F    .  53             push ebx                         ; |hOwner
+0041E420    .  FF15 C0D64600  call dword ptr ds:[<&USER32.Mess>; \MessageBoxA
+0041E426    >  8B4D E0        mov ecx,dword ptr ss:[ebp-20]
+0041E429    .  83C1 F0        add ecx,-10
+0041E42C    .  E8 722CFEFF    call HideWiza.004010A3
+0041E431    .  8BCF           mov ecx,edi
+0041E433    .  E8 CEF9FFFF    call HideWiza.0041DE06
+0041E438    .  E9 C0020000    jmp HideWiza.0041E6FD
+0041E43D    >  8BCF           mov ecx,edi
+0041E43F    .  E8 D6FBFFFF    call HideWiza.0041E01A
+0041E444    .  85C0           test eax,eax
+0041E446    .^ 74 DE          je short HideWiza.0041E426
+0041E448    .  FF75 E0        push dword ptr ss:[ebp-20]       ; /MutexName
+0041E44B    .  6A 01          push 1                           ; |InitialOwner = TRUE
+0041E44D    .  53             push ebx                         ; |pSecurity
+0041E44E    .  FF15 DCD14600  call dword ptr ds:[<&KERNEL32.Cr>; \CreateMutexA
+0041E454    .  6A 4F          push 4F
+0041E456    .  8987 A4000000  mov dword ptr ds:[edi+A4],eax
+0041E45C    .  8D85 BD170000  lea eax,dword ptr ss:[ebp+17BD]
+0041E462    .  53             push ebx
+0041E463    .  50             push eax
+0041E464    .  C745 EC 040000>mov dword ptr ss:[ebp-14],4
+0041E46B    .  895D E8        mov dword ptr ss:[ebp-18],ebx
+0041E46E    .  889D BC170000  mov byte ptr ss:[ebp+17BC],bl
+0041E474    .  E8 67140300    call HideWiza.0044F8E0
+0041E479    .  53             push ebx
+0041E47A    .  8D45 E8        lea eax,dword ptr ss:[ebp-18]
+0041E47D    .  68 C41C4700    push HideWiza.00471CC4           ;  ASCII "All"
+0041E482    .  50             push eax
+0041E483    .  E8 E9A30000    call HideWiza.00428871
+0041E488    .  83C4 18        add esp,18
+0041E48B    .  85C0           test eax,eax
+0041E48D    .  0F84 4B010000  je HideWiza.0041E5DE
+0041E493    .  8B35 14D04600  mov esi,dword ptr ds:[<&ADVAPI32>;  ADVAPI32.RegQueryValueExA
+0041E499    .  8D45 EC        lea eax,dword ptr ss:[ebp-14]
+0041E49C    .  50             push eax                         ; /pBufSize
+0041E49D    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]    ; |
+0041E4A0    .  50             push eax                         ; |Buffer
+0041E4A1    .  53             push ebx                         ; |pValueType
+0041E4A2    .  53             push ebx                         ; |Reserved
+0041E4A3    .  BF 203E4700    mov edi,HideWiza.00473E20        ; |ASCII "LUT"
+0041E4A8    .  57             push edi                         ; |ValueName => "LUT"
+0041E4A9    .  FF75 E8        push dword ptr ss:[ebp-18]       ; |hKey
+0041E4AC    .  895D F0        mov dword ptr ss:[ebp-10],ebx    ; |
+0041E4AF    .  FFD6           call esi                         ; \RegQueryValueExA
+0041E4B1    .  837D F0 1F     cmp dword ptr ss:[ebp-10],1F
+0041E4B5    .  73 16          jnb short HideWiza.0041E4CD
+0041E4B7    .  FF45 F0        inc dword ptr ss:[ebp-10]
+0041E4BA    .  6A 04          push 4                           ; /BufSize = 4
+0041E4BC    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]    ; |
+0041E4BF    .  50             push eax                         ; |Buffer
+0041E4C0    .  6A 04          push 4                           ; |ValueType = REG_DWORD
+0041E4C2    .  53             push ebx                         ; |Reserved
+0041E4C3    .  57             push edi                         ; |ValueName => "LUT"
+0041E4C4    .  FF75 E8        push dword ptr ss:[ebp-18]       ; |hKey
+0041E4C7    .  FF15 6CD04600  call dword ptr ds:[<&ADVAPI32.Re>; \RegSetValueExA
+0041E4CD    >  8B45 F0        mov eax,dword ptr ss:[ebp-10]
+0041E4D0    .  A3 44EB4800    mov dword ptr ds:[48EB44],eax
+0041E4D5    .  8D45 EC        lea eax,dword ptr ss:[ebp-14]
+0041E4D8    .  50             push eax
+0041E4D9    .  8D85 BC170000  lea eax,dword ptr ss:[ebp+17BC]
+0041E4DF    .  50             push eax
+0041E4E0    .  53             push ebx
+0041E4E1    .  53             push ebx
+0041E4E2    .  68 60224700    push HideWiza.00472260           ;  ASCII "UDATA"
+0041E4E7    .  FF75 E8        push dword ptr ss:[ebp-18]
+0041E4EA    .  C745 EC 500000>mov dword ptr ss:[ebp-14],50
+0041E4F1    .  FFD6           call esi
+0041E4F3    .  33C0           xor eax,eax
+0041E4F5    .  889D 40180000  mov byte ptr ss:[ebp+1840],bl
+0041E4FB    .  8DBD 41180000  lea edi,dword ptr ss:[ebp+1841]
+0041E501    .  AB             stos dword ptr es:[edi]
+0041E502    .  AB             stos dword ptr es:[edi]
+0041E503    .  AB             stos dword ptr es:[edi]
+0041E504    .  AB             stos dword ptr es:[edi]
+0041E505    .  66:AB          stos word ptr es:[edi]
+0041E507    .  AA             stos byte ptr es:[edi]
+0041E508    .  8D45 EC        lea eax,dword ptr ss:[ebp-14]
+0041E50B    .  50             push eax
+0041E50C    .  8D85 40180000  lea eax,dword ptr ss:[ebp+1840]
+0041E512    .  50             push eax
+0041E513    .  53             push ebx
+0041E514    .  53             push ebx
+0041E515    .  68 143E4700    push HideWiza.00473E14           ;  ASCII "VerifyCode"
+0041E51A    .  FF75 E8        push dword ptr ss:[ebp-18]
+0041E51D    .  C745 EC 140000>mov dword ptr ss:[ebp-14],14
+0041E524    .  FFD6           call esi
+0041E526    .  6A 31          push 31
+0041E528    .  8D85 0D180000  lea eax,dword ptr ss:[ebp+180D]
+0041E52E    .  53             push ebx
+0041E52F    .  50             push eax
+0041E530    .  C745 EC 320000>mov dword ptr ss:[ebp-14],32
+0041E537    .  889D 0C180000  mov byte ptr ss:[ebp+180C],bl
+0041E53D    .  E8 9E130300    call HideWiza.0044F8E0
+0041E542    .  83C4 0C        add esp,0C
+0041E545    .  8D45 EC        lea eax,dword ptr ss:[ebp-14]
+0041E548    .  50             push eax
+0041E549    .  8D85 0C180000  lea eax,dword ptr ss:[ebp+180C]
+0041E54F    .  50             push eax
+0041E550    .  53             push ebx
+0041E551    .  53             push ebx
+0041E552    .  68 0C3E4700    push HideWiza.00473E0C           ;  ASCII "HideSN"
+0041E557    .  FF75 E8        push dword ptr ss:[ebp-18]
+0041E55A    .  FFD6           call esi
+0041E55C    .  8D85 0C180000  lea eax,dword ptr ss:[ebp+180C]
+0041E562    .  50             push eax
+0041E563    .  B9 F8EE4800    mov ecx,HideWiza.0048EEF8
+0041E568    .  E8 7342FEFF    call HideWiza.004027E0
+0041E56D    .  8D45 EC        lea eax,dword ptr ss:[ebp-14]
+0041E570    .  50             push eax
+0041E571    .  8D45 E4        lea eax,dword ptr ss:[ebp-1C]
+0041E574    .  50             push eax
+0041E575    .  53             push ebx
+0041E576    .  53             push ebx
+0041E577    .  BF 003E4700    mov edi,HideWiza.00473E00        ;  ASCII "SetupFlag"
+0041E57C    .  57             push edi
+0041E57D    .  FF75 E8        push dword ptr ss:[ebp-18]
+0041E580    .  895D E4        mov dword ptr ss:[ebp-1C],ebx
+0041E583    .  C745 EC 040000>mov dword ptr ss:[ebp-14],4
+0041E58A    .  FFD6           call esi
+0041E58C    .  8D85 40180000  lea eax,dword ptr ss:[ebp+1840]
+0041E592    .  50             push eax                         ; /String
+0041E593    .  FF15 F8D34600  call dword ptr ds:[<&KERNEL32.ls>; \lstrlenA
+0041E599    .  83F8 05        cmp eax,5
+0041E59C    .  75 20          jnz short HideWiza.0041E5BE
+0041E59E    .  837D E4 01     cmp dword ptr ss:[ebp-1C],1
+0041E5A2    .  75 1A          jnz short HideWiza.0041E5BE
+0041E5A4    .  51             push ecx
+0041E5A5    .  8D85 40180000  lea eax,dword ptr ss:[ebp+1840]
+0041E5AB    .  8BCC           mov ecx,esp
+0041E5AD    .  8965 CC        mov dword ptr ss:[ebp-34],esp
+0041E5B0    .  50             push eax
+0041E5B1    .  E8 3149FEFF    call HideWiza.00402EE7
+0041E5B6    .  8B4D DC        mov ecx,dword ptr ss:[ebp-24]
+0041E5B9    .  E8 C1F8FFFF    call HideWiza.0041DE7F
+0041E5BE    >  395D E4        cmp dword ptr ss:[ebp-1C],ebx
+0041E5C1    .  74 0A          je short HideWiza.0041E5CD
+0041E5C3    .  57             push edi                         ; /ValueName
+0041E5C4    .  FF75 E8        push dword ptr ss:[ebp-18]       ; |hKey
+0041E5C7    .  FF15 60D04600  call dword ptr ds:[<&ADVAPI32.Re>; \RegDeleteValueA
+0041E5CD    >  FF75 E8        push dword ptr ss:[ebp-18]       ; /hKey
+0041E5D0    .  FF15 04D04600  call dword ptr ds:[<&ADVAPI32.Re>; \RegCloseKey
+0041E5D6    .  8B7D DC        mov edi,dword ptr ss:[ebp-24]
+0041E5D9    .  BE FCEE4800    mov esi,HideWiza.0048EEFC
+0041E5DE    >  8D85 BC170000  lea eax,dword ptr ss:[ebp+17BC]
+0041E5E4    .  50             push eax
+0041E5E5    .  B9 F4EE4800    mov ecx,HideWiza.0048EEF4
+0041E5EA    .  E8 F141FEFF    call HideWiza.004027E0
+0041E5EF    .  68 603E4700    push HideWiza.00473E60
+0041E5F4    .  8BCE           mov ecx,esi
+0041E5F6    .  E8 2471FEFF    call HideWiza.0040571F
+0041E5FB    .  85C0           test eax,eax
+0041E5FD    .  74 53          je short HideWiza.0041E652
+0041E5FF    .  A1 F4EE4800    mov eax,dword ptr ds:[48EEF4]
+0041E604    .  3958 F4        cmp dword ptr ds:[eax-C],ebx
+0041E607    .  7E 49          jle short HideWiza.0041E652
+0041E609    .  53             push ebx
+0041E60A    .  8D8D 54FEFFFF  lea ecx,dword ptr ss:[ebp-1AC]
+0041E610    .  E8 954FFFFF    call HideWiza.004135AA
+0041E615    .  8D8D 54FEFFFF  lea ecx,dword ptr ss:[ebp-1AC]
+0041E61B    .  C645 FC 01     mov byte ptr ss:[ebp-4],1
+0041E61F    .  E8 FD970100    call HideWiza.00437E21
+0041E624    .  83F8 02        cmp eax,2
+0041E627    .  75 13          jnz short HideWiza.0041E63C
+0041E629    .  8D8D 54FEFFFF  lea ecx,dword ptr ss:[ebp-1AC]
+0041E62F    .  885D FC        mov byte ptr ss:[ebp-4],bl
+0041E632    .  E8 FD4FFFFF    call HideWiza.00413634
+0041E637    .  E9 B4000000    jmp HideWiza.0041E6F0
+0041E63C    >  6A 64          push 64                          ; /Timeout = 100. ms
+0041E63E    .  FF15 B4D14600  call dword ptr ds:[<&KERNEL32.Sl>; \Sleep
+0041E644    .  8D8D 54FEFFFF  lea ecx,dword ptr ss:[ebp-1AC]
+0041E64A    .  885D FC        mov byte ptr ss:[ebp-4],bl
+0041E64D    .  E8 E24FFFFF    call HideWiza.00413634
+0041E652    >  E8 05C60100    call HideWiza.0043AC5C
+0041E657    .  FF15 84D04600  call dword ptr ds:[<&COMCTL32.#1>; [InitCommonControls
+0041E65D    .  8D45 D0        lea eax,dword ptr ss:[ebp-30]
+0041E660    .  50             push eax                         ; /phToken
+0041E661    .  6A 28          push 28                          ; |DesiredAccess = TOKEN_QUERY|TOKEN_ADJUST_PRIVILEGES
+0041E663    .  FF15 D8D14600  call dword ptr ds:[<&KERNEL32.Ge>; |[GetCurrentProcess
+0041E669    .  50             push eax                         ; |hProcess
+0041E66A    .  FF15 64D04600  call dword ptr ds:[<&ADVAPI32.Op>; \OpenProcessToken
+0041E670    .  85C0           test eax,eax
+0041E672    .  74 57          je short HideWiza.0041E6CB
+0041E674    .  8D45 C8        lea eax,dword ptr ss:[ebp-38]
+0041E677    .  50             push eax                         ; /pLocalId
+0041E678    .  68 EC3D4700    push HideWiza.00473DEC           ; |Privilege = "SeDebugPrivilege"
+0041E67D    .  53             push ebx                         ; |SystemName
+0041E67E    .  FF15 68D04600  call dword ptr ds:[<&ADVAPI32.Lo>; \LookupPrivilegeValueA
+0041E684    .  85C0           test eax,eax
+0041E686    .  74 3A          je short HideWiza.0041E6C2
+0041E688    .  8B45 C8        mov eax,dword ptr ss:[ebp-38]
+0041E68B    .  53             push ebx                         ; /pRetLen
+0041E68C    .  8985 48180000  mov dword ptr ss:[ebp+1848],eax  ; |
+0041E692    .  8B45 CC        mov eax,dword ptr ss:[ebp-34]    ; |
+0041E695    .  53             push ebx                         ; |pPrevState
+0041E696    .  53             push ebx                         ; |PrevStateSize
+0041E697    .  8985 4C180000  mov dword ptr ss:[ebp+184C],eax  ; |
+0041E69D    .  8D85 44180000  lea eax,dword ptr ss:[ebp+1844]  ; |
+0041E6A3    .  50             push eax                         ; |pNewState
+0041E6A4    .  53             push ebx                         ; |DisableAllPrivileges
+0041E6A5    .  FF75 D0        push dword ptr ss:[ebp-30]       ; |hToken
+0041E6A8    .  C785 44180000 >mov dword ptr ss:[ebp+1844],1    ; |
+0041E6B2    .  C785 50180000 >mov dword ptr ss:[ebp+1850],2    ; |
+0041E6BC    .  FF15 48D04600  call dword ptr ds:[<&ADVAPI32.Ad>; \AdjustTokenPrivileges
+0041E6C2    >  FF75 D0        push dword ptr ss:[ebp-30]       ; /hObject
+0041E6C5    .  FF15 08D44600  call dword ptr ds:[<&KERNEL32.Cl>; \CloseHandle
+0041E6CB    >  53             push ebx
+0041E6CC    .  8D4D 00        lea ecx,dword ptr ss:[ebp]
+0041E6CF    .  E8 C71F0000    call HideWiza.0042069B
+0041E6D4    .  8D45 00        lea eax,dword ptr ss:[ebp]
+0041E6D7    .  8BC8           mov ecx,eax
+0041E6D9    .  C645 FC 02     mov byte ptr ss:[ebp-4],2
+0041E6DD    .  8947 20        mov dword ptr ds:[edi+20],eax
+0041E6E0    .  E8 3C970100    call HideWiza.00437E21
+0041E6E5    .  8D4D 00        lea ecx,dword ptr ss:[ebp]
+0041E6E8    .  885D FC        mov byte ptr ss:[ebp-4],bl
+0041E6EB    .  E8 19F8FFFF    call HideWiza.0041DF09
+0041E6F0    >  8B4D E0        mov ecx,dword ptr ss:[ebp-20]
+0041E6F3    .  83C1 F0        add ecx,-10
+0041E6F6    .  E8 A829FEFF    call HideWiza.004010A3
+0041E6FB    >  33C0           xor eax,eax
+0041E6FD    >  8B4D F4        mov ecx,dword ptr ss:[ebp-C]
+0041E700    .  64:890D 000000>mov dword ptr fs:[0],ecx
+0041E707    .  59             pop ecx
+0041E708    .  5F             pop edi
+0041E709    .  5E             pop esi
+0041E70A    .  5B             pop ebx
+0041E70B    .  8B8D 54180000  mov ecx,dword ptr ss:[ebp+1854]
+0041E711    .  33CD           xor ecx,ebp
+0041E713    .  E8 E41A0300    call HideWiza.004501FC
+0041E718    .  81C5 58180000  add ebp,1858
+0041E71E    .  C9             leave
+0041E71F    .  C3             retn
+
+hsluoyz@sohu.com
+
+12345678901234567
+
+序列号无效线验证,请稍等
+
+序列号无效
+
+
+00440771   |.  FF15 B0D74600  call dword ptr ds:[<&WININET.InternetOpenA>]     ;  WININET.InternetOpenA
+00440777   |.  8946 08        mov dword ptr ds:[esi+8],eax
+0044077A   |.  85C0           test eax,eax
+0044077C   |.  75 09          jnz short HideWiza.00440787
+0044077E   |.  50             push eax
+0044077F   |.  FF76 04        push dword ptr ds:[esi+4]
+00440782   |.  E8 38FFFFFF    call HideWiza.004406BF
+00440787   |>  56             push esi                                         ; /Arg2
+00440788   |.  50             push eax                                         ; |Arg1
+00440789   |.  B9 50104900    mov ecx,HideWiza.00491050                        ; |
+0044078E   |.  E8 BAFBFFFF    call HideWiza.0044034D                           ; \HideWiza.0044034D
+00440793   |.  8BC6           mov eax,esi
+00440795   |.  5E             pop esi
+00440796   |.  5D             pop ebp
+00440797   \.  C2 1800        retn 18
+
+
+signed int __thiscall sub_42ACC8(void *this)
+{
+  void *v1; // esi@1
+  size_t v2; // ecx@1
+  size_t v3; // ecx@1
+  size_t v4; // ecx@1
+  size_t v5; // ecx@1
+  size_t v6; // ecx@1
+  size_t v7; // ecx@1
+  size_t v8; // ecx@1
+  size_t v9; // ecx@1
+  size_t v10; // ecx@1
+  int v11; // eax@5
+  int v12; // eax@5
+  int v14; // [sp+0h] [bp-68h]@5
+  int v15; // [sp+4h] [bp-64h]@5
+  HKEY phkResult; // [sp+8h] [bp-60h]@1
+  DWORD cbData; // [sp+Ch] [bp-5Ch]@1
+  char Src; // [sp+10h] [bp-58h]@2
+  char v19; // [sp+11h] [bp-57h]@2
+  BYTE Data; // [sp+44h] [bp-24h]@2
+  HWND v21; // [sp+48h] [bp-20h]@5
+  signed int v22; // [sp+4Ch] [bp-1Ch]@5
+  signed int v23; // [sp+50h] [bp-18h]@5
+  size_t v24; // [sp+54h] [bp-14h]@1
+  int v25; // [sp+64h] [bp-4h]@5
+
+  v1 = this;
+  CDialog::OnInitDialog();
+  v24 = v2;
+  sub_402EE7(&v24, "购?);
+  sub_412D7B((LPCSTR)v24);
+  v24 = v3;
+  sub_402EE7(&v24, "http://www.seapsoft.com/buy.htm");
+  sub_412EEE((char *)v24);
+  v24 = v4;
+  sub_402EE7(&v24, "备用购?);
+  sub_412D7B((LPCSTR)v24);
+  v24 = v5;
+  sub_402EE7(&v24, "http://hi.baidu.com/seapsoft");
+  sub_412EEE((char *)v24);
+  v24 = v6;
+  sub_402EE7(&v24, "点?);
+  sub_412D7B((LPCSTR)v24);
+  v24 = v7;
+  sub_402EE7(&v24, "id=27690");
+  sub_412DBC((char *)v24);
+  v24 = v8;
+  sub_402EE7(&v24, "http://www.seapsoft.com/cn/hw/share.html");
+  sub_412EEE((char *)v24);
+  v24 = v9;
+  sub_402EE7(&v24, "点?);
+  sub_412D7B((LPCSTR)v24);
+  v24 = v10;
+  cbData = (DWORD)&v24;
+  sub_402EE7(&v24, "http://www.seapsoft.com/cn/hw/sethomepage.html");
+  sub_412EEE((char *)v24);
+  v24 = 0;
+  *((_DWORD *)v1 + 262) = dword_48F258;
+  phkResult = 0;
+  if ( sub_428871(&phkResult, "All") )
+  {
+    v24 = 49;
+    BYTE3(v24) = 0;
+    Src = 0;
+    memset(&v19, 0, v24);
+    RegQueryValueExA(phkResult, "HideSN", 0, 0, &Data, &cbData);
+    cbData = 50;
+    RegQueryValueExA(phkResult, "E_Mail", 0, 0, (LPBYTE)&Src, &cbData);
+    sub_4027E0(&Src);
+    RegCloseKey(phkResult);
+    sub_4027E0((char *)&Data);
+  }
+  if ( dword_48F040 && *(_DWORD *)(dword_48EEF8 - 12) == 17 )
+  {
+    v11 = sub_407E27((int)&v14, 8u);
+    v25 = 0;
+    v12 = sub_429C45((int)&v15, v11, "*********");
+    LOBYTE(v25) = 1;
+    sub_402793(v12);
+    ATL::CStringData::Release(v15 - 16);
+    v25 = -1;
+    ATL::CStringData::Release(v14 - 16);
+    v24 = 0;
+    v23 = 1;
+    v22 = 207;
+    v21 = (HWND)*((_DWORD *)v1 + 163);
+    SendMessageA(v21, 0xCFu, 1u, 0);
+    v24 = 0;
+    v23 = 1;
+    v22 = 207;
+    v21 = (HWND)*((_DWORD *)v1 + 79);
+    SendMessageA(v21, 0xCFu, 1u, 0);
+    CWnd::EnableWindow(0);
+  }
+  v24 = 0;
+  v23 = 0;
+  v22 = 10;
+  v21 = (HWND)*((_DWORD *)v1 + 8);
+  SetTimer(v21, 0xAu, 0, 0);
+  unknown_libname_162(0);
+  return 1;
+}
+
+
+signed int __thiscall sub_42BFB4(void *this, int a2, int a3)
+{
+  int v3; // edi@1
+  void *v4; // ebx@1
+  int v6; // eax@3
+  int v7; // eax@3
+  int v8; // eax@3
+  int v9; // edi@3
+  const CHAR *v10; // ebx@5
+  int v11; // esi@5
+  int v12; // esi@7
+  int v13; // eax@10
+  int v14; // eax@10
+  int v15; // eax@12
+  int v16; // eax@12
+  int v17; // eax@14
+  int v18; // eax@14
+  int v19; // eax@15
+  int v20; // eax@15
+  int v21; // eax@15
+  int v22; // [sp+Ch] [bp-20h]@11
+  const CHAR *v23; // [sp+10h] [bp-1Ch]@3
+  char *v24; // [sp+14h] [bp-18h]@15
+  int v25; // [sp+18h] [bp-14h]@3
+  int v26; // [sp+1Ch] [bp-10h]@3
+  int v27; // [sp+28h] [bp-4h]@1
+  char v28; // [sp+2Ch] [bp+0h]@1
+  char Src; // [sp+82Ch] [bp+800h]@15
+  char v30; // [sp+82Dh] [bp+801h]@15
+  unsigned int v31; // [sp+C2Ch] [bp+C00h]@1
+
+  v31 = (unsigned int)&v28 ^ __security_cookie;
+  v3 = a3;
+  v4 = this;
+  v27 = 0;
+  if ( !WaitForSingleObject(hHandle, 0) )
+    goto LABEL_2;
+  unknown_libname_115(v3);
+  v6 = sub_435E86(v26);
+  unknown_libname_113(v6);
+  v7 = sub_435E86(v26);
+  unknown_libname_113(v7);
+  LOBYTE(v27) = 2;
+  sub_402793(&a2);
+  sub_42BF09(&v25, &v23);
+  LOBYTE(v27) = 3;
+  v8 = (int)_LN34_4(v4, 0, 0, 0, 0);
+  v9 = v8;
+  if ( !v8 )
+  {
+    ATL::CStringData::Release(v23 - 16);
+    ATL::CStringData::Release(v25 - 16);
+LABEL_2:
+    ATL::CStringData::Release(a2 - 16);
+    return -20;
+  }
+  v10 = v23;
+  v27 = 2;
+  LOBYTE(v27) = 5;
+  v11 = (int)sub_4415E2(v8, 0, v23, 0, 1u, 0, 0, 0x20000000u);
+  if ( !v11 )
+    goto LABEL_6;
+  v27 = 2;
+  LOBYTE(v27) = 7;
+  if ( !CHttpFile::SendRequest(v11, 0, 0, 0, 0) ) ///////////////////////////////////////发送消息
+  {
+    (*(void (__thiscall **)(int))(*(_DWORD *)v11 + 76))(v11);
+    v13 = *(_DWORD *)v11;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v13 + 4))(v11, 1);
+    (*(void (__thiscall **)(int))(*(_DWORD *)v9 + 12))(v9);
+    v14 = *(_DWORD *)v9;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v14 + 4))(v9, 1);
+LABEL_6:
+    ATL::CStringData::Release(v10 - 16);
+    ATL::CStringData::Release(v25 - 16);
+    v25 = -20;
+LABEL_7:
+    v12 = v25;
+LABEL_8:
+    ATL::CStringData::Release(a2 - 16);
+    return v12;
+  }
+  v27 = 2;
+  if ( !CHttpFile::QueryInfoStatusCode(&v22) )
+  {
+    (*(void (__thiscall **)(int))(*(_DWORD *)v11 + 76))(v11);
+    v15 = *(_DWORD *)v11;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v15 + 4))(v11, 1);
+    (*(void (__thiscall **)(int))(*(_DWORD *)v9 + 12))(v9);
+    v16 = *(_DWORD *)v9;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v16 + 4))(v9, 1);
+    ATL::CStringData::Release(v10 - 16);
+    ATL::CStringData::Release(v25 - 16);
+    v25 = -21;
+    goto LABEL_7;
+  }
+  if ( v22 != 200 )
+  {
+    (*(void (__thiscall **)(_DWORD))(*(_DWORD *)v11 + 76))(v11);
+    v17 = *(_DWORD *)v11;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v17 + 4))(v11, 1);
+    (*(void (__thiscall **)(_DWORD))(*(_DWORD *)v9 + 12))(v9);
+    v18 = *(_DWORD *)v9;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v18 + 4))(v9, 1);
+    v12 = v22;
+    ATL::CStringData::Release(v10 - 16);
+    ATL::CStringData::Release(v25 - 16);
+    goto LABEL_8;
+  }
+  Src = 0;
+  memset(&v30, 0, 0x3FFu);
+  sub_4027E0(Caption);
+  v19 = *(_DWORD *)v11;
+  v25 = 1000;
+  v24 = &Src;
+  (*(void (__thiscall **)(int, char *, signed int))(v19 + 52))(v11, &Src, 1000); //////////////////////////CInternetFile_Read 00440915 第一次read
+  sub_4027E0(&Src); //////////////////////////// -->sub_402466 Src是个c字符串 0042C1F3
+  (*(void (__thiscall **)(_DWORD))(*(_DWORD *)v11 + 76))(v11); ////////////////////////////CInternetFile::Close
+  v20 = *(_DWORD *)v11;
+  v25 = 1;
+  (*(void (__thiscall **)(int, signed int))(v20 + 4))(v11, 1); ////////////////////////////CHttpFile::_scalar_deleting_destructor_
+  (*(void (__thiscall **)(_DWORD))(*(_DWORD *)v9 + 12))(v9); ////////////////////////////CInternetFile::Close
+  v21 = *(_DWORD *)v9;
+  v25 = 1;
+  (*(void (__thiscall **)(int, signed int))(v21 + 4))(v9, 1); ////////////////////////////sub_440C6D一些字符串释放
+  ATL::CStringData::Release(v10 - 16);
+  ATL::CStringData::Release(v25 - 16);
+  ATL::CStringData::Release(a2 - 16);
+  return 1;
+}
+
+int __thiscall sub_402466(void *this, char *Src, rsize_t MaxCount)
+{
+  void *v3; // edi@1
+  int result; // eax@2
+  unsigned int v5; // ebx@5
+  char *v6; // esi@5
+  void *v7; // eax@5
+
+  v3 = this;
+  if ( MaxCount )
+  {
+    if ( !Src )
+      unknown_libname_109(-2147024809);
+    v5 = *(_DWORD *)(*(_DWORD *)this - 12);
+    v6 = &Src[-*(_DWORD *)this];
+    v7 = (void *)ATL::CSimpleStringT<char_0>::PrepareWrite(MaxCount);
+    if ( (unsigned int)v6 > v5 )
+      memcpy_s(v7, *(_DWORD *)(*(_DWORD *)v3 - 8), Src, MaxCount); ///////////////v7在EAX里，为00BB8F18::ABABFE00->ABAB0032
+      memmove_s(v7, *(_DWORD *)(*(_DWORD *)v3 - 8), &v6[(_DWORD)v7], MaxCount);
+    result = sub_40149D(MaxCount);
+  }
+  else
+  {
+    result = unknown_libname_115(this);
+  }
+  return result;
+}
+
+CCmdTarget::OnCmdMsg 00434eb2
+
+hsluoyz@sohu.com
+12345678901234567
+
+http://www.seapsoft.com/HideAll.asp?SNID=12345678901234567&MCODE=4977&EMAIL=hsluoyz@sohu.com&FLAG=1&VID=0
+
+设置内存访问断点
+00451F3B(in strtol) call strtoxl
+00451439(in atol) call 00451F3B(in strtol)
+0042B1F8 call upside
+
+0042D1DF CWnd::SetWindowTextA
+
+00474BB8  BECAE1CC
+00474BBC  2E31BAA3
+00474BC0  A2B3EBC7
+00474BC4  DAD4D4CA
+00474BC8  EDB1D0C1
+00474BCC  ABCBD0D6
+00474BD0  F3CAF7BB
+00474BD4  F3D7EAB1
+00474BD8  F2BBFCBC
+00474BDC  F7BBA5B5
+00474BE0  FCBCD2D3
+00474BE4  2E32A3A1
+00474BE8  C3D3EBC7
+00474BEC  DDBDECBF
+00474BF0  FED2FCBC
+00474BF4  CF2FD8B2
+00474BF8  B1BECAD4
+00474BFC  BCEDC8BE
+00474C00  00A3A1FE
+
+00BBF538  DAD4FDD5 正在xxx请稍等
+00BBF53C  D0D0F8BD
+00BBF540  DFCFDAD4
+00BBF544  A4D6E9D1
+00BBF548  C9EBC72C
+00BBF54C  2EC8B5D4
+00BBF550  AB002E2E
+
+0042D21B(in CWnd::SetWindowText) call SetWindowTextA 序列号无效
+0042B1CB call upside
+
+0042B1A5(jmp)
+0042B1CB 序列号无效
+227(jmp back)
+251(jmp back)
+275(jmp back)
+
+0042B1F5    > \FF75 DC        push dword ptr ss:[ebp-24]
+0042B1F8    .  E8 46620200    call HideWiza.00451443
+0042B1FD    .  83F8 1E        cmp eax,1E
+0042B200    .  59             pop ecx
+0042B201    .  7D 77          jge short HideWiza.0042B27A //////////////////////////////////jump it
+0042B203    .  83F8 02        cmp eax,2
+0042B206    .  75 21          jnz short HideWiza.0042B229
+0042B208    .  51             push ecx
+0042B209    .  8BCC           mov ecx,esp
+0042B20B    .  8965 F0        mov dword ptr ss:[ebp-10],esp
+0042B20E    .  68 24534700    push HideWiza.00475324
+0042B213    .  E8 CF7CFDFF    call HideWiza.00402EE7
+0042B218    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0042B21B    .  50             push eax
+0042B21C    .  E8 EFEEFFFF    call HideWiza.0042A110
+0042B221    .  59             pop ecx
+0042B222    .  59             pop ecx
+0042B223    .  C645 FC 0A     mov byte ptr ss:[ebp-4],0A
+0042B227    .^ EB 9D          jmp short HideWiza.0042B1C6 ////////////////////////////jump back to death
+0042B229    >  3BC7           cmp eax,edi
+0042B22B    .  74 29          je short HideWiza.0042B256
+0042B22D    .  83F8 14        cmp eax,14
+0042B230    .  74 24          je short HideWiza.0042B256
+0042B232    .  51             push ecx
+0042B233    .  8BCC           mov ecx,esp
+0042B235    .  8965 F0        mov dword ptr ss:[ebp-10],esp
+0042B238    .  68 E4524700    push HideWiza.004752E4
+0042B23D    .  E8 A57CFDFF    call HideWiza.00402EE7
+0042B242    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0042B245    .  50             push eax
+0042B246    .  E8 C5EEFFFF    call HideWiza.0042A110
+0042B24B    .  59             pop ecx
+0042B24C    .  59             pop ecx
+0042B24D    .  C645 FC 0C     mov byte ptr ss:[ebp-4],0C
+0042B251    .^ E9 70FFFFFF    jmp HideWiza.0042B1C6 ////////////////////////////jump back to death
+0042B256    >  51             push ecx
+0042B257    .  8BCC           mov ecx,esp
+0042B259    .  8965 F0        mov dword ptr ss:[ebp-10],esp
+0042B25C    .  68 0C534700    push HideWiza.0047530C
+0042B261    .  E8 817CFDFF    call HideWiza.00402EE7
+0042B266    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0042B269    .  50             push eax
+0042B26A    .  E8 A1EEFFFF    call HideWiza.0042A110
+0042B26F    .  59             pop ecx
+0042B270    .  59             pop ecx
+0042B271    .  C645 FC 0B     mov byte ptr ss:[ebp-4],0B
+0042B275    .^ E9 4CFFFFFF    jmp HideWiza.0042B1C6 ////////////////////////////jump back to death
+0042B27A    >  8B4D E4        mov ecx,dword ptr ss:[ebp-1C]
+0042B27D    .  8BD1           mov edx,ecx
+0042B27F    .  6BD2 0D        imul edx,edx,0D
+0042B282    .  81EA 2E160000  sub edx,162E
+0042B288    .  3BD0           cmp edx,eax
+0042B28A    .  74 46          je short HideWiza.0042B2D2 //////////////////////////////////jump it
+0042B28C    .  51             push ecx
+0042B28D    .  8BCC           mov ecx,esp
+0042B28F    .  8965 F0        mov dword ptr ss:[ebp-10],esp
+0042B292    .  68 E4524700    push HideWiza.004752E4
+0042B297    .  E8 4B7CFDFF    call HideWiza.00402EE7
+0042B29C    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0042B29F    .  50             push eax
+0042B2A0    .  E8 6BEEFFFF    call HideWiza.0042A110
+0042B2A5    .  59             pop ecx
+0042B2A6    .  59             pop ecx
+0042B2A7    .  FF30           push dword ptr ds:[eax]               ; /Arg1
+0042B2A9    .  8B4D E0        mov ecx,dword ptr ss:[ebp-20]         ; |
+0042B2AC    .  C645 FC 0D     mov byte ptr ss:[ebp-4],0D            ; |
+0042B2B0    .  E8 2A1F0000    call HideWiza.0042D1DF                ; \HideWiza.0042D1DF
+0042B2B5    .  8B4D F0        mov ecx,dword ptr ss:[ebp-10]
+0042B2B8    .  83C1 F0        add ecx,-10
+0042B2BB    .  C645 FC 07     mov byte ptr ss:[ebp-4],7
+0042B2BF    .  E8 DF5DFDFF    call HideWiza.004010A3
+0042B2C4    .  8B4D EC        mov ecx,dword ptr ss:[ebp-14]
+0042B2C7    .  57             push edi                              ; /Arg1
+0042B2C8    .  E8 F61F0000    call HideWiza.0042D2C3                ; \HideWiza.0042D2C3
+0042B2CD    .  E9 B8020000    jmp HideWiza.0042B58A
+0042B2D2    >  6BC9 0B        imul ecx,ecx,0B
+0042B2D5    .  81F1 07060000  xor ecx,607
+0042B2DB    .  8BC1           mov eax,ecx
+0042B2DD    .  894D EC        mov dword ptr ss:[ebp-14],ecx
+0042B2E0    .  B9 10270000    mov ecx,2710
+0042B2E5    .  3BC1           cmp eax,ecx
+0042B2E7    .  7D 0A          jge short HideWiza.0042B2F3 //////////////////////////////////auto jump it
+0042B2E9    >  6BC0 0A        imul eax,eax,0A
+0042B2EC    .  3BC1           cmp eax,ecx
+0042B2EE    .^ 7C F9          jl short HideWiza.0042B2E9
+0042B2F0    .  8945 EC        mov dword ptr ss:[ebp-14],eax
+0042B2F3    >  3D A0860100    cmp eax,186A0
+0042B2F8    .  7C 15          jl short HideWiza.0042B30F //////////////////////////////////auto jump it
+0042B2FA    .  EB 03          jmp short HideWiza.0042B2FF
+0042B2FC    >  8B45 EC        mov eax,dword ptr ss:[ebp-14]
+0042B2FF    >  6A 0A          push 0A
+0042B301    .  99             cdq
+0042B302    .  59             pop ecx
+0042B303    .  F7F9           idiv ecx
+0042B305    .  3D A0860100    cmp eax,186A0
+0042B30A    .  8945 EC        mov dword ptr ss:[ebp-14],eax
+0042B30D    .^ 7D ED          jge short HideWiza.0042B2FC
+0042B30F    >  893D 40F04800  mov dword ptr ds:[48F040],edi
+0042B315    .  E8 6CAB0000    call HideWiza.00435E86
+0042B31A    .  50             push eax
+0042B31B    .  8D4D E4        lea ecx,dword ptr ss:[ebp-1C]
+0042B31E    .  E8 816DFDFF    call HideWiza.004020A4
+0042B323    .  FF75 EC        push dword ptr ss:[ebp-14]
+0042B326    .  8D45 E4        lea eax,dword ptr ss:[ebp-1C]
+0042B329    .  68 F0EF4600    push HideWiza.0046EFF0                ;  ASCII "%d"
+
+hsluoyz@sohu.com
+12345678901234567

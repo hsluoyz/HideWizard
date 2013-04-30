@@ -1,0 +1,339 @@
+偶以前搞过一些破解，但都是一些软柿子，前几天有隐藏木马这么个需求，包括进程、窗口、硬盘文件等，非要用HideWIzard出手不可。HideWIzard6.4有破解版但功能不够，只好拿HideWIzard最新版开刀了。感觉还是挺麻烦的，也许是我水平很菜把。
+0)先透露一下，程序总共有三处验证
+1.对注册码在客户端进行初步判断，输入不正确的话什么提示都没有，否则进入第二步服务器激活验证；
+2.与服务器通信，在static控件显示返回结果；
+3.使用imagehlp进行EXE校验，如果发现二进制被修改则自动退出
+下面详细阐述哈
+
+1)首先是PEiD查壳，啥也没发现，事实上到最后我也不知道是什么壳，也没学过脱壳，汗一个，哪位大大知道不妨告知哈。IDA6.1打开EXE，可以判断是MFC程序
+
+2)OD加载程序后，自带的7E42F56B断点一定要清除，否则会导致系统假死，狂按F9过一分钟能缓回来，缓不回来只好重启了。加载成功后窗口切换焦点时也是一顿一顿的，不知是不是有意为之，调试过程中尽量不要切换焦点。顿的程度好像与系统和OD也有关系，具体作用关系不明，最好找个能自动清除debug标志位的。OD换了好几个才碰上个顺手的，我用的ODbyDYK v1.10里的Pza74.exe，能自动清除debug标志位，对call jmp等指令能高亮显示，Pza74缺点是插件不如OllyICE多，但OllyICE没高亮，看的很头疼。
+
+3)正式进入调试步骤，首先需要在激活按钮处下断，因为没有任何提示，只好在CCmdTarget::OnCmdMsg处下断，在IDA记下地址在OD直接bp。OnCmdMsg第四个参数即为消息响应函数。函数如下,程序在0042AB9B处检查注册码位数，只要让输入的注册码为17位就不会跳到函数末尾，在末尾处可以看出SendMessageA是进入下一步的关键，因此中间的算法就不用看了，直接找跳转，把该nop的nop掉。
+
+0042AB5F   /.  55             push ebp
+0042AB60   |.  8BEC           mov ebp,esp
+0042AB62   |.  83EC 14        sub esp,14
+0042AB65   |.  56             push esi
+0042AB66   |.  8BF1           mov esi,ecx
+0042AB68   |.  8975 EC        mov dword ptr ss:[ebp-14],esi
+0042AB6B   |.  FF15 C4D14600  call dword ptr ds:[<&KERNEL32.GetTickCount>]     ; [GetTickCount
+0042AB71   |.  8BC8           mov ecx,eax
+0042AB73   |.  2B0D A4F44800  sub ecx,dword ptr ds:[48F4A4]
+0042AB79   |.  81F9 2C010000  cmp ecx,12C
+0042AB7F   |.  0F82 40010000  jb HideWiza.0042ACC5
+0042AB85   |.  6A 01          push 1
+0042AB87   |.  8BCE           mov ecx,esi
+0042AB89   |.  A3 A4F44800    mov dword ptr ds:[48F4A4],eax
+0042AB8E   |.  E8 B0530000    call HideWiza.0042FF43
+0042AB93   |.  81C6 10040000  add esi,410
+0042AB99   |.  8B06           mov eax,dword ptr ds:[esi]
+0042AB9B   |.  8378 F4 11     cmp dword ptr ds:[eax-C],11 ////////////////////
+0042AB9F   |.  8BCE           mov ecx,esi
+0042ABA1   |.  0F85 14010000  jnz HideWiza.0042ACBB ////////////////不成立则跳到0042ACC5处，输入17位注册码即可
+...
+0042AC9B   |. /75 1C          jnz short HideWiza.0042ACB9 /////////////////不能跳，需要nop掉
+0042AC9D   |. |394D F0        cmp dword ptr ss:[ebp-10],ecx
+0042ACA0   |. |75 17          jnz short HideWiza.0042ACB9 /////////////////不能跳，需要nop掉
+0042ACA2   |. |8B45 EC        mov eax,dword ptr ss:[ebp-14]
+0042ACA5   |. |6A 0A          push 0A                                          ; /lParam = A
+0042ACA7   |. |6A 01          push 1                                           ; |wParam = 1
+0042ACA9   |. |68 CA040000    push 4CA                                         ; |Message = MSG(4CA)
+0042ACAE   |. |FF70 20        push dword ptr ds:[eax+20]                       ; |hWnd
+0042ACB1   |. |FF15 84D54600  call dword ptr ds:[<&USER32.SendMessageA>]       ; \SendMessageA
+0042ACB7   |. |EB 0C          jmp short HideWiza.0042ACC5
+0042ACB9   |> \8BCE           mov ecx,esi
+0042ACBB   |>  68 F2DC4600    push HideWiza.0046DCF2
+0042ACC0   |.  E8 1B7BFDFF    call HideWiza.004027E0
+0042ACC5   |>  5E             pop esi
+0042ACC6   |.  C9             leave
+0042ACC7   \.  C3             retn
+
+4)用ue把exe改掉后发现程序自动退出，猜测是某种校验，这时程序不会弹出窗口，判断是在CXXDlg构造函数或OnInitialDialog等处。直接在入口处跟进，这里有个取巧的办法，直接od同时加载未修改和已修改的一起debug，比较哪里不一样，如果过程中哪个call直接把窗口弹出来或是退出，就需要重新加载跟进这个call。最后发现下面的代码，终于找到了，就是imagehlp.MapFileAndCheckSumA这个东西做的怪。查了一下imagehlp，的确是进行二进制校验的一个东东。0041E36E处可以看出[ebp-2C]与[ebp-28]一个是编译时生成的，一个是现算的。后面jnz判断是否一致，后面的OpenMutexA啥的应该是保证程序单例，是程序后面的逻辑，因此把jnz nop掉即可。
+
+0041E349    .  E9 AD030000    jmp HideWiza.0041E6FB
+0041E34E    >  8D45 D8        lea eax,dword ptr ss:[ebp-28]
+0041E351    .  50             push eax
+0041E352    .  8D45 D4        lea eax,dword ptr ss:[ebp-2C]
+0041E355    .  33FF           xor edi,edi
+0041E357    .  50             push eax
+0041E358    .  47             inc edi
+0041E359    .  68 40EA4800    push HideWiza.0048EA40
+0041E35E    .  897D D4        mov dword ptr ss:[ebp-2C],edi
+0041E361    .  895D D8        mov dword ptr ss:[ebp-28],ebx
+0041E364    .  FF15 FCD74600  call dword ptr ds:[<&imagehlp.Ma>;  imagehlp.MapFileAndCheckSumA /////////////////////////////////////////////Checksum!!!
+0041E36A    .  85C0           test eax,eax
+0041E36C    .  75 0C          jnz short HideWiza.0041E37A
+0041E36E    .  8B45 D4        mov eax,dword ptr ss:[ebp-2C]
+0041E371    .  3B45 D8        cmp eax,dword ptr ss:[ebp-28]
+0041E374    .  0F85 81030000  jnz HideWiza.0041E6FB ////////////////////////////////should not jmp, so nop it
+0041E37A    >  68 6C3E4700    push HideWiza.00473E6C           ;  ASCII "SEAN_U_HIDE_WIZARD"
+0041E37F    .  8D4D E0        lea ecx,dword ptr ss:[ebp-20]
+0041E382    .  E8 604BFEFF    call HideWiza.00402EE7
+0041E387    .  FF75 E0        push dword ptr ss:[ebp-20]       ; /MutexName
+0041E38A    .  895D FC        mov dword ptr ss:[ebp-4],ebx     ; |
+0041E38D    .  53             push ebx                         ; |Inheritable
+0041E38E    .  57             push edi                         ; |Access
+0041E38F    .  FF15 2CD44600  call dword ptr ds:[<&KERNEL32.Op>; \OpenMutexA
+0041E395    .  8B7D DC        mov edi,dword ptr ss:[ebp-24]
+0041E398    .  8987 A4000000  mov dword ptr ds:[edi+A4],eax
+0041E39E    .  3BC3           cmp eax,ebx
+0041E3A0    .  0F84 97000000  je HideWiza.0041E43D
+
+
+5)终于到最后一步，这时运行程序随便输入注册码注册，发现还有服务器验证，IDA里发现程序网络通信用的是CHttpFile，继承于CInternetFile，结合IDA6.1的hex rays进行反编译，CInternetFile有四个方法，Read ReadString Write WriteString，我们主要关心的是读取，记下地址在OD里下断，发现程序调用的是CInternetFile::Read函数。一般人写通信程序都会把建立连接、发送、接受、关闭连接自己封装一下，因此可以顺便在IDA里把周围的关于网络通信的函数没名字的都命名一下，找调用者就结合OD，这么比较方便查看。
+用OD在CInternetFile::Read往上导，发现一个可疑函数，IDA反编译一下：
+
+signed int __thiscall sub_42BFB4(void *this, int a2, int a3)
+{
+  int v3; // edi@1
+  void *v4; // ebx@1
+  int v6; // eax@3
+  int v7; // eax@3
+  int v8; // eax@3
+  int v9; // edi@3
+  const CHAR *v10; // ebx@5
+  int v11; // esi@5
+  int v12; // esi@7
+  int v13; // eax@10
+  int v14; // eax@10
+  int v15; // eax@12
+  int v16; // eax@12
+  int v17; // eax@14
+  int v18; // eax@14
+  int v19; // eax@15
+  int v20; // eax@15
+  int v21; // eax@15
+  int v22; // [sp+Ch] [bp-20h]@11
+  const CHAR *v23; // [sp+10h] [bp-1Ch]@3
+  char *v24; // [sp+14h] [bp-18h]@15
+  int v25; // [sp+18h] [bp-14h]@3
+  int v26; // [sp+1Ch] [bp-10h]@3
+  int v27; // [sp+28h] [bp-4h]@1
+  char v28; // [sp+2Ch] [bp+0h]@1
+  char Src; // [sp+82Ch] [bp+800h]@15
+  char v30; // [sp+82Dh] [bp+801h]@15
+  unsigned int v31; // [sp+C2Ch] [bp+C00h]@1
+
+  v31 = (unsigned int)&v28 ^ __security_cookie;
+  v3 = a3;
+  v4 = this;
+  v27 = 0;
+  if ( !WaitForSingleObject(hHandle, 0) )
+    goto LABEL_2;
+  unknown_libname_115(v3);
+  v6 = sub_435E86(v26);
+  unknown_libname_113(v6);
+  v7 = sub_435E86(v26);
+  unknown_libname_113(v7);
+  LOBYTE(v27) = 2;
+  sub_402793(&a2);
+  sub_42BF09(&v25, &v23);
+  LOBYTE(v27) = 3;
+  v8 = (int)_LN34_4(v4, 0, 0, 0, 0);
+  v9 = v8;
+  if ( !v8 )
+  {
+    ATL::CStringData::Release(v23 - 16);
+    ATL::CStringData::Release(v25 - 16);
+LABEL_2:
+    ATL::CStringData::Release(a2 - 16);
+    return -20;
+  }
+  v10 = v23;
+  v27 = 2;
+  LOBYTE(v27) = 5;
+  v11 = (int)sub_4415E2(v8, 0, v23, 0, 1u, 0, 0, 0x20000000u);
+  if ( !v11 )
+    goto LABEL_6;
+  v27 = 2;
+  LOBYTE(v27) = 7;
+  if ( !CHttpFile::SendRequest(v11, 0, 0, 0, 0) ) ///////////////////////////////////////发送消息
+  {
+    (*(void (__thiscall **)(int))(*(_DWORD *)v11 + 76))(v11);
+    v13 = *(_DWORD *)v11;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v13 + 4))(v11, 1);
+    (*(void (__thiscall **)(int))(*(_DWORD *)v9 + 12))(v9);
+    v14 = *(_DWORD *)v9;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v14 + 4))(v9, 1);
+LABEL_6:
+    ATL::CStringData::Release(v10 - 16);
+    ATL::CStringData::Release(v25 - 16);
+    v25 = -20;
+LABEL_7:
+    v12 = v25;
+LABEL_8:
+    ATL::CStringData::Release(a2 - 16);
+    return v12;
+  }
+  v27 = 2;
+  if ( !CHttpFile::QueryInfoStatusCode(&v22) )
+  {
+    (*(void (__thiscall **)(int))(*(_DWORD *)v11 + 76))(v11);
+    v15 = *(_DWORD *)v11;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v15 + 4))(v11, 1);
+    (*(void (__thiscall **)(int))(*(_DWORD *)v9 + 12))(v9);
+    v16 = *(_DWORD *)v9;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v16 + 4))(v9, 1);
+    ATL::CStringData::Release(v10 - 16);
+    ATL::CStringData::Release(v25 - 16);
+    v25 = -21;
+    goto LABEL_7;
+  }
+  if ( v22 != 200 )
+  {
+    (*(void (__thiscall **)(_DWORD))(*(_DWORD *)v11 + 76))(v11);
+    v17 = *(_DWORD *)v11;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v17 + 4))(v11, 1);
+    (*(void (__thiscall **)(_DWORD))(*(_DWORD *)v9 + 12))(v9);
+    v18 = *(_DWORD *)v9;
+    v25 = 1;
+    (*(void (__thiscall **)(int, signed int))(v18 + 4))(v9, 1);
+    v12 = v22;
+    ATL::CStringData::Release(v10 - 16);
+    ATL::CStringData::Release(v25 - 16);
+    goto LABEL_8;
+  }
+  Src = 0;
+  memset(&v30, 0, 0x3FFu);
+  sub_4027E0(Caption);
+  v19 = *(_DWORD *)v11;
+  v25 = 1000;
+  v24 = &Src;
+  (*(void (__thiscall **)(int, char *, signed int))(v19 + 52))(v11, &Src, 1000); ////////////////CInternetFile_Read 此处地址00440915 一共两次read，调用CInternet::Read
+  sub_4027E0(&Src); ///////////////////// -->调用sub_402466 Src返回的c字符串 此处地址为0042C1F3 写了2个byte的内存，后面都不用看了
+  (*(void (__thiscall **)(_DWORD))(*(_DWORD *)v11 + 76))(v11); ////////////////////////////CInternetFile::Close
+  v20 = *(_DWORD *)v11;
+  v25 = 1;
+  (*(void (__thiscall **)(int, signed int))(v20 + 4))(v11, 1); ////////////////////////////CHttpFile::_scalar_deleting_destructor_
+  (*(void (__thiscall **)(_DWORD))(*(_DWORD *)v9 + 12))(v9); ////////////////////////////CInternetFile::Close
+  v21 = *(_DWORD *)v9;
+  v25 = 1;
+  (*(void (__thiscall **)(int, signed int))(v21 + 4))(v9, 1); ////////////////////////////sub_440C6D一些字符串释放
+  ATL::CStringData::Release(v10 - 16);
+  ATL::CStringData::Release(v25 - 16);
+  ATL::CStringData::Release(a2 - 16);
+  return 1;
+}
+
+6)可以发现干货就在最后几行，00440915内部调用CInternet::Read，整个函数一共调用了两次，用ethereal截报文发现客户端向www.seapsoft.com发送两个HTTP请求，服务器回的都是很简单的字符串1，存在Src里，sub_4027E0(&Src)处理一下，写了两个2byte的内存，位置不固定。
+7)明显的思路是在Src处下内存访问断点，发现到了strtoxl这么个函数，是C的一个内部使用的函数，往上导，到strtol，最后到atol，后来发现这个地址被读了十几次，于是干脆换了另一个方法。程序在请求返回后会设置static字符串，于是在SetWindowTextA处下API断点。往上倒腾，功夫不负有心人，发现了程序的验证逻辑：
+
+0042B1F5    > \FF75 DC        push dword ptr ss:[ebp-24]
+0042B1F8    .  E8 46620200    call HideWiza.00451443
+0042B1FD    .  83F8 1E        cmp eax,1E
+0042B200    .  59             pop ecx
+0042B201    .  7D 77          jge short HideWiza.0042B27A //////////////////////////////////jump it
+0042B203    .  83F8 02        cmp eax,2
+0042B206    .  75 21          jnz short HideWiza.0042B229
+0042B208    .  51             push ecx
+0042B209    .  8BCC           mov ecx,esp
+0042B20B    .  8965 F0        mov dword ptr ss:[ebp-10],esp
+0042B20E    .  68 24534700    push HideWiza.00475324
+0042B213    .  E8 CF7CFDFF    call HideWiza.00402EE7
+0042B218    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0042B21B    .  50             push eax
+0042B21C    .  E8 EFEEFFFF    call HideWiza.0042A110
+0042B221    .  59             pop ecx
+0042B222    .  59             pop ecx
+0042B223    .  C645 FC 0A     mov byte ptr ss:[ebp-4],0A
+0042B227    .^ EB 9D          jmp short HideWiza.0042B1C6 ////////////////////////////jump back to death
+0042B229    >  3BC7           cmp eax,edi
+0042B22B    .  74 29          je short HideWiza.0042B256
+0042B22D    .  83F8 14        cmp eax,14
+0042B230    .  74 24          je short HideWiza.0042B256
+0042B232    .  51             push ecx
+0042B233    .  8BCC           mov ecx,esp
+0042B235    .  8965 F0        mov dword ptr ss:[ebp-10],esp
+0042B238    .  68 E4524700    push HideWiza.004752E4
+0042B23D    .  E8 A57CFDFF    call HideWiza.00402EE7
+0042B242    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0042B245    .  50             push eax
+0042B246    .  E8 C5EEFFFF    call HideWiza.0042A110
+0042B24B    .  59             pop ecx
+0042B24C    .  59             pop ecx
+0042B24D    .  C645 FC 0C     mov byte ptr ss:[ebp-4],0C
+0042B251    .^ E9 70FFFFFF    jmp HideWiza.0042B1C6 ////////////////////////////jump back to death
+0042B256    >  51             push ecx
+0042B257    .  8BCC           mov ecx,esp
+0042B259    .  8965 F0        mov dword ptr ss:[ebp-10],esp
+0042B25C    .  68 0C534700    push HideWiza.0047530C
+0042B261    .  E8 817CFDFF    call HideWiza.00402EE7
+0042B266    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0042B269    .  50             push eax
+0042B26A    .  E8 A1EEFFFF    call HideWiza.0042A110
+0042B26F    .  59             pop ecx
+0042B270    .  59             pop ecx
+0042B271    .  C645 FC 0B     mov byte ptr ss:[ebp-4],0B
+0042B275    .^ E9 4CFFFFFF    jmp HideWiza.0042B1C6 ////////////////////////////jump back to death
+0042B27A    >  8B4D E4        mov ecx,dword ptr ss:[ebp-1C]
+0042B27D    .  8BD1           mov edx,ecx
+0042B27F    .  6BD2 0D        imul edx,edx,0D
+0042B282    .  81EA 2E160000  sub edx,162E
+0042B288    .  3BD0           cmp edx,eax
+0042B28A    .  74 46          je short HideWiza.0042B2D2 //////////////////////////////////jump it
+0042B28C    .  51             push ecx
+0042B28D    .  8BCC           mov ecx,esp
+0042B28F    .  8965 F0        mov dword ptr ss:[ebp-10],esp
+0042B292    .  68 E4524700    push HideWiza.004752E4
+0042B297    .  E8 4B7CFDFF    call HideWiza.00402EE7
+0042B29C    .  8D45 F0        lea eax,dword ptr ss:[ebp-10]
+0042B29F    .  50             push eax
+0042B2A0    .  E8 6BEEFFFF    call HideWiza.0042A110
+0042B2A5    .  59             pop ecx
+0042B2A6    .  59             pop ecx
+0042B2A7    .  FF30           push dword ptr ds:[eax]               ; /Arg1
+0042B2A9    .  8B4D E0        mov ecx,dword ptr ss:[ebp-20]         ; |
+0042B2AC    .  C645 FC 0D     mov byte ptr ss:[ebp-4],0D            ; |
+0042B2B0    .  E8 2A1F0000    call HideWiza.0042D1DF                ; \HideWiza.0042D1DF
+0042B2B5    .  8B4D F0        mov ecx,dword ptr ss:[ebp-10]
+0042B2B8    .  83C1 F0        add ecx,-10
+0042B2BB    .  C645 FC 07     mov byte ptr ss:[ebp-4],7
+0042B2BF    .  E8 DF5DFDFF    call HideWiza.004010A3
+0042B2C4    .  8B4D EC        mov ecx,dword ptr ss:[ebp-14]
+0042B2C7    .  57             push edi                              ; /Arg1
+0042B2C8    .  E8 F61F0000    call HideWiza.0042D2C3                ; \HideWiza.0042D2C3
+0042B2CD    .  E9 B8020000    jmp HideWiza.0042B58A
+0042B2D2    >  6BC9 0B        imul ecx,ecx,0B
+0042B2D5    .  81F1 07060000  xor ecx,607
+0042B2DB    .  8BC1           mov eax,ecx
+0042B2DD    .  894D EC        mov dword ptr ss:[ebp-14],ecx
+0042B2E0    .  B9 10270000    mov ecx,2710
+0042B2E5    .  3BC1           cmp eax,ecx
+0042B2E7    .  7D 0A          jge short HideWiza.0042B2F3 //////////////////////////////////auto jump it
+0042B2E9    >  6BC0 0A        imul eax,eax,0A
+0042B2EC    .  3BC1           cmp eax,ecx
+0042B2EE    .^ 7C F9          jl short HideWiza.0042B2E9
+0042B2F0    .  8945 EC        mov dword ptr ss:[ebp-14],eax
+0042B2F3    >  3D A0860100    cmp eax,186A0
+0042B2F8    .  7C 15          jl short HideWiza.0042B30F //////////////////////////////////auto jump it
+0042B2FA    .  EB 03          jmp short HideWiza.0042B2FF
+0042B2FC    >  8B45 EC        mov eax,dword ptr ss:[ebp-14]
+0042B2FF    >  6A 0A          push 0A
+0042B301    .  99             cdq
+0042B302    .  59             pop ecx
+0042B303    .  F7F9           idiv ecx
+0042B305    .  3D A0860100    cmp eax,186A0
+0042B30A    .  8945 EC        mov dword ptr ss:[ebp-14],eax
+0042B30D    .^ 7D ED          jge short HideWiza.0042B2FC
+0042B30F    >  893D 40F04800  mov dword ptr ds:[48F040],edi
+0042B315    .  E8 6CAB0000    call HideWiza.00435E86
+0042B31A    .  50             push eax
+0042B31B    .  8D4D E4        lea ecx,dword ptr ss:[ebp-1C]
+0042B31E    .  E8 816DFDFF    call HideWiza.004020A4
+0042B323    .  FF75 EC        push dword ptr ss:[ebp-14]
+0042B326    .  8D45 E4        lea eax,dword ptr ss:[ebp-1C]
+0042B329    .  68 F0EF4600    push HideWiza.0046EFF0                ;  ASCII "%d"
+
+8)0042D21B是CWnd::SetWindowText，他调用SetWindowTextA显示序列号无效字符串
+0042D21B的调用者为0042B1CB，找通向0042B1CB的跳转，有三处，还都在后边，分别是227 251 275，分析一下这段代码，0042B201处判断eax是不是不小于1e，如果小于1e，再判断是不是2，如果是2，进入227玩完；不是2，判断是不是14，不是的话进入251玩完，是的话进入275玩完。自己修改一下返回值发现2是序列号已存在，14没看，1也就是其它情况是序列号无效。因此需要在0042B201处jmp掉。随后在0042B28A处发现一个je，一般相等情况只有一种，肯定是好的，不用看直接jmp掉，最后什么都没改，程序已经crack掉了，记录一下中间没改的跳转，0042B2E7和0042B2F8，为保险起见，可以jmp一下。
+
+后记：
+很早就注册pediy了，最近实验室搞安全方面的东西，才开始经常在pediy混，前两天发现问问题问的没kx了，果断写篇破解赚点分，第一次写的不好大家多多包涵哈
+
+下面附上程序
